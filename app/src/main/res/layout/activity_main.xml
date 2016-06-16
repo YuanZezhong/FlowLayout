@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="yuanyi.com.flowlayout.MainActivity">
+
+    <yuanyi.com.flowlayout.view.FlowLayout
+        android:id="@+id/flowLayout"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#5FF0">
+
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="Super Big"
+            android:textSize="18dp"
+            android:background="#69F"
+            android:gravity="center"/>
+    </yuanyi.com.flowlayout.view.FlowLayout>
+
+</RelativeLayout>
