@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--水平方向上的间距-->
+    <attr name="verticalSpace" format="dimension" />
+    <!--垂直方向上的间距-->
+    <attr name="horizontalSpace" format="dimension" />
+
+    <declare-styleable name="FlowLayout">
+        <attr name="verticalSpace" />
+        <attr name="horizontalSpace" />
+    </declare-styleable>
+</resources>

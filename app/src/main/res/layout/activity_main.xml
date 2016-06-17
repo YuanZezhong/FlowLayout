@@ -9,16 +9,17 @@
     <yuanyi.com.flowlayout.view.FlowLayout
         android:id="@+id/flowLayout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="#5FF0">
-
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:text="Super Big"
-            android:textSize="18dp"
-            android:background="#69F"
-            android:gravity="center"/>
+        android:layout_height="match_parent"
+        android:background="#69F"
+        android:padding="5dp">
     </yuanyi.com.flowlayout.view.FlowLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true"
+        android:text="调整"/>
 
 </RelativeLayout>
