@@ -8,6 +8,8 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +19,9 @@ import yuanyi.com.flowlayout.util.DensityUtils;
 import yuanyi.com.flowlayout.view.FlowLayout;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int[] FLOW_GRAVITYS = {FlowLayout.CENTER, FlowLayout.CENTER_HORIZONTAL,
+            FlowLayout.CENTER_VERTICAL, FlowLayout.LEFT, FlowLayout.RIGHT};
+
     private FlowLayout flowLayout;
     private View button;
 
@@ -37,8 +42,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void registerListener() {
         button.setOnClickListener(new View.OnClickListener() {
+            private int cnt = 0;
+
             @Override
             public void onClick(View v) {
+                flowLayout.setFlowGravity(FLOW_GRAVITYS[cnt++ % FLOW_GRAVITYS.length]);
             }
         });
     }
@@ -46,9 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initFlowLayout() {
         int padding = DensityUtils.dp2px(getApplicationContext(), 8);
-        int minWidth = DensityUtils.dp2px(getApplicationContext(), 30);
         int height = DensityUtils.dp2px(getApplicationContext(), 36);
-        int textSize = DensityUtils.dp2px(getApplicationContext(), 10);
 
         TextView tv;
         Random random = new Random();
@@ -57,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
             tv.setPadding(padding, padding, padding, padding);
             tv.setGravity(Gravity.CENTER);
             tv.setTextColor(Color.rgb(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-            tv.setTextSize(textSize);
             StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < 4; ++j) {
+            int cnt = random.nextInt(10) + 2;
+            for (int j = 0; j < cnt; ++j) {
                 sb.append(CHARS[random.nextInt(CHARS.length)]);
             }
             tv.setText(sb);
@@ -69,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
             background.setColor(Color.rgb(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
             tv.setBackgroundDrawable(background);
 
-            int width = random.nextInt(minWidth) + 100;
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(width, height);
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
             flowLayout.addView(tv, layoutParams);
         }
     }

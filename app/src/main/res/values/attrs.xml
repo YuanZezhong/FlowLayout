@@ -8,5 +8,12 @@
     <declare-styleable name="FlowLayout">
         <attr name="verticalSpace" />
         <attr name="horizontalSpace" />
+        <attr name="flowGravity">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+            <enum name="center_horizontal" value="2"/>
+            <enum name="center_vertical" value="4"/>
+            <enum name="center" value="8"/>
+        </attr>
     </declare-styleable>
 </resources>

@@ -11,6 +11,7 @@ import java.util.List;
 
 import yuanyi.com.flowlayout.R;
 import yuanyi.com.flowlayout.util.DensityUtils;
+import yuanyi.com.flowlayout.util.LogUtil;
 
 /**
  * 流式布局
@@ -21,9 +22,19 @@ public class FlowLayout extends ViewGroup {
     /* 默认垂直间距, 单位dp */
     private static final int DEFAULT_VERTICAL_SPACE = 5;
 
+    /* FlowGravity 属性值，居中、左对齐、右对齐 */
+    public static final int LEFT = 0;
+    public static final int RIGHT = 1;
+    public static final int CENTER_HORIZONTAL = 2;
+    public static final int CENTER_VERTICAL = 4;
+    public static final int CENTER = 8;
+
     private List<Line> mLines;          // 记录所有行
     private int mHorizontalSpace;       // 水平方向上的间距
     private int mVerticalSpace;         // 垂直方向上的间距
+    private int mFlowGravity;           // 排列方式
+    private int dividerColor;           // 分割线颜色
+    private int dividerHeight;          // 分隔线高度
 
     public FlowLayout(Context context) {
         this(context, null);
@@ -41,19 +52,40 @@ public class FlowLayout extends ViewGroup {
                         .obtainStyledAttributes(attrs, R.styleable.FlowLayout, defStyleAttr, 0);
         mHorizontalSpace = (int) typedArray.getDimension(R.styleable.FlowLayout_horizontalSpace,
                 DensityUtils.dp2px(context, DEFAULT_HORIZONTAL_SPACE));
-
         mVerticalSpace = (int) typedArray.getDimension(R.styleable.FlowLayout_verticalSpace,
                 DensityUtils.dp2px(context, DEFAULT_VERTICAL_SPACE));
+        mFlowGravity = typedArray.getInt(R.styleable.FlowLayout_flowGravity, LEFT);
         typedArray.recycle();
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int x = getPaddingLeft();
+        int x;
         int y = getPaddingTop();
+        /* 判断是否需要垂直居中 */
+        if (mFlowGravity == CENTER_VERTICAL || mFlowGravity == CENTER) {
+            int contentHeight = getContentHeight();
+            /* 判断是否满足可以垂直居中的条件 */
+            if ((getVerticalPadding() + contentHeight) < getMeasuredHeight()) {
+                y += (getMeasuredHeight() - contentHeight - getVerticalPadding()) / 2;
+            }
+        }
 
         for (Line line : mLines) {
             int horizontalSpace = line.getHorizontalSpace();
+            switch (mFlowGravity) {
+                case RIGHT:
+                    x = getPaddingLeft() + (line.getMaxWidth() - line.getLineWidth());
+                    break;
+                case CENTER_HORIZONTAL:
+                case CENTER:
+                    x = getPaddingLeft() + (line.getMaxWidth() - line.getLineWidth()) / 2;
+                    break;
+                case LEFT:
+                default:
+                    x = getPaddingLeft();
+                    break;
+            }
             for (int i = 0; i < line.getChildCount(); ++i) {
                 View child = line.getChildAt(i);
                 MarginLayoutParams params = (MarginLayoutParams) child.getLayoutParams();
@@ -64,7 +96,6 @@ public class FlowLayout extends ViewGroup {
                 x += rMargin;
                 x += horizontalSpace;
             }
-            x = getPaddingLeft();
             y += line.getLineHeight();
             y += mVerticalSpace;
         }
@@ -78,8 +109,8 @@ public class FlowLayout extends ViewGroup {
         int hSize = MeasureSpec.getSize(heightMeasureSpec);
         int hMode = MeasureSpec.getMode(heightMeasureSpec);
         /* 获取内边距(水平方向和垂直方向) */
-        int paddingHorizontal = getPaddingLeft() + getPaddingRight();
-        int paddingVertical = getPaddingBottom() + getPaddingTop();
+        int paddingHorizontal = getHorizontalPadding();
+        int paddingVertical = getVerticalPadding();
 
         mLines.clear();
         Line line = new Line(wSize - paddingHorizontal, mHorizontalSpace);
@@ -132,14 +163,54 @@ public class FlowLayout extends ViewGroup {
         setMeasuredDimension(resultWidth, resultHeight);
     }
 
+    /**
+     * 获取布局内容共占用的高度
+     * */
+    private int getContentHeight() {
+        int contentHeight = 0;
+        for (int i = 0; i < mLines.size(); ++i) {
+            Line line = mLines.get(i);
+            contentHeight += line.getLineHeight();
+            if (i > 0) {
+                contentHeight += getVerticalSpace();
+            }
+        }
+        return contentHeight;
+    }
+
+    /**
+     * 获取当前FlowLayout水平方向上的内边距
+     * */
+    public int getHorizontalPadding() {
+        return getPaddingLeft() + getPaddingRight();
+    }
+
+    /**
+     * 获取当前FlowLayout垂直方向上的内边距
+     * */
+    public int getVerticalPadding() {
+        return getPaddingBottom() + getPaddingTop();
+    }
+
+    /**
+     * 获取当前FlowLayout的水平间距
+     * */
     public int getHorizontalSpace() {
         return mHorizontalSpace;
     }
 
+    /**
+     * 获取当前FlowLayout的垂直间距
+     * */
     public int getVerticalSpace() {
         return mVerticalSpace;
     }
 
+    /**
+     * 设置水平间距值
+     * @param px
+     *          新的水平间距值，单位px
+     * */
     public void setHorizontalSpace(int px) {
         if (px >= 0
                 && px != getHorizontalSpace()
@@ -149,6 +220,11 @@ public class FlowLayout extends ViewGroup {
         }
     }
 
+    /**
+     * 设置垂直间距
+     * @param px
+     *          新的垂直间距值，单位px
+     * */
     public void setVerticalSpace(int px) {
         if (px >= 0
                 && px != getVerticalSpace()
@@ -158,6 +234,13 @@ public class FlowLayout extends ViewGroup {
         }
     }
 
+    /**
+     * 设置FlowLayout的水平和垂直间距
+     * @param horizontal
+     *          新的水平间距, 单位px
+     * @param vertical
+     *          新的垂直间距, 单位px
+     * */
     public void setSpace(int horizontal, int vertical) {
         if ((horizontal != getHorizontalSpace() || vertical != getVerticalSpace())
                 && horizontal >= 0 && horizontal < getMeasuredHeight()
@@ -169,13 +252,42 @@ public class FlowLayout extends ViewGroup {
     }
 
     /**
+     * 获取当前FlowLayout的排列方式
+     * */
+    public int getFlowGravity() {
+        return mFlowGravity;
+    }
+
+    /**
+     * 设置FlowLayout的排列方式
+     * @param flowGravity
+     *          新的排列方式，如果不支持指定的方式则不予理会
+     * */
+    public void setFlowGravity(int flowGravity) {
+        if (flowGravity != getFlowGravity()) {
+            switch (flowGravity) {
+                case CENTER:
+                case CENTER_HORIZONTAL:
+                case CENTER_VERTICAL:
+                case LEFT:
+                case RIGHT:
+                    mFlowGravity = flowGravity;
+                    requestLayout();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
      * 代表每一行
      * */
     private static class Line {
         private List<View> children;    // 此行中所有的View
         private int lineWidth;          // 此行已占宽度
         private int lineHeight;         // 此行已占高度
-        private int maxWidth;           // 此行规定最大宽度
+        private int maxWidth;           // 此行规定最大可用宽度
         private int horizontalSpace;    // 此行的水平间距
 
         public Line(int maxWidth, int horizontalSpace) {
@@ -202,6 +314,10 @@ public class FlowLayout extends ViewGroup {
 
         public int getHorizontalSpace() {
             return horizontalSpace;
+        }
+
+        public int getMaxWidth() {
+            return maxWidth;
         }
 
         /**
@@ -297,6 +413,7 @@ public class FlowLayout extends ViewGroup {
             lineWidth = lineHeight = 0;
         }
     }
+
 
     public static class LayoutParams extends ViewGroup.MarginLayoutParams {
 
