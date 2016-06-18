@@ -141,32 +141,31 @@ public class FlowLayout extends ViewGroup {
     }
 
     public void setHorizontalSpace(int px) {
-        if (px >= 0 && px < getMeasuredWidth()) {
+        if (px >= 0
+                && px != getHorizontalSpace()
+                && px < getMeasuredWidth()) {
             mHorizontalSpace = px;
             requestLayout();
         }
     }
 
     public void setVerticalSpace(int px) {
-        if (px >= 0 && px < getMeasuredHeight()) {
+        if (px >= 0
+                && px != getVerticalSpace()
+                && px < getMeasuredHeight()) {
             mVerticalSpace = px;
             requestLayout();
         }
     }
 
     public void setSpace(int horizontal, int vertical) {
-        if (horizontal == mHorizontalSpace && vertical == mVerticalSpace) {
-            return;
-        }
-
-        if (horizontal >= 0 && horizontal < getMeasuredWidth()) {
+        if ((horizontal != getHorizontalSpace() || vertical != getVerticalSpace())
+                && horizontal >= 0 && horizontal < getMeasuredHeight()
+                && vertical >= 0 && vertical < getMeasuredHeight()) {
             mHorizontalSpace = horizontal;
-        }
-        if (vertical >= 0 && vertical < getMeasuredHeight()) {
             mVerticalSpace = vertical;
+            requestLayout();
         }
-
-        requestLayout();
     }
 
     /**

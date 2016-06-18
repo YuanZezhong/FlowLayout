@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                flowLayout.setHorizontalSpace(flowLayout.getHorizontalSpace() + 3);
-                flowLayout.setVerticalSpace(flowLayout.getVerticalSpace() + 3);
             }
         });
     }
